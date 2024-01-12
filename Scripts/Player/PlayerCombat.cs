@@ -1,23 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerCombat : MonoBehaviour
 {
-    [SerializeField] private Animator _animator; 
     [SerializeField] private Transform _attackPoint;
     [SerializeField] private float _attackRange =0.5f;
     [SerializeField] private LayerMask enemyLayers;
     [SerializeField] private int _attackDamage;
     [SerializeField] private float _attackRate = 2f;
+    [SerializeField] private KeyCode _melee;
+    [SerializeField] private KeyCode _shoot;
 
     private float _nextAttackTime = 0f;
+
+    public event UnityAction MeleeHit;
+    public event UnityAction ShootHit;
 
     private void Update()
     {
         if(Time.time >= _nextAttackTime) 
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(_melee)) 
             {
                 Melee();
                 _nextAttackTime = Time.time +1f / _attackRate;
@@ -26,7 +31,7 @@ public class PlayerCombat : MonoBehaviour
 
         if (Time.time >= _nextAttackTime)
         {
-            if (Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKeyDown(_shoot)) 
             {
                 Shoot();
                 _nextAttackTime = Time.time + 1f / _attackRate;
@@ -36,9 +41,9 @@ public class PlayerCombat : MonoBehaviour
 
     private void Melee()
     {
-       _animator.SetTrigger(PlayerAnimatorData.Params.Melee);
+        MeleeHit.Invoke();
 
-     Collider2D[] hitEnemis = Physics2D.OverlapCircleAll(_attackPoint.position, _attackRange, enemyLayers);
+        Collider2D[] hitEnemis = Physics2D.OverlapCircleAll(_attackPoint.position, _attackRange, enemyLayers);
 
         foreach (Collider2D enemy in hitEnemis)
         {
@@ -49,7 +54,7 @@ public class PlayerCombat : MonoBehaviour
 
     private void Shoot()
     {
-        _animator.SetTrigger(PlayerAnimatorData.Params.Shoot);
+        ShootHit.Invoke();
 
         Collider2D[] hitEnemis = Physics2D.OverlapCircleAll(_attackPoint.position, _attackRange, enemyLayers);
 

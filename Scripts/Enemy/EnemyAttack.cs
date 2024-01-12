@@ -5,9 +5,10 @@ using UnityEngine;
 public class EnemyAttack : MonoBehaviour
 {
     [SerializeReference] private int _damage;
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.TryGetComponent(out Player player))
+        if(collision.gameObject.TryGetComponent(out PlayerHealth playerHealth))
         {
             collision.GetComponent<PlayerHealth>().TakeDamage(_damage);
         }

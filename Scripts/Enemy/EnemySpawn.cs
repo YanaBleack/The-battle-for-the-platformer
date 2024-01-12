@@ -11,14 +11,14 @@ public class EnemySpawn : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(AppearIn());
+        SpawnEnemy();
     }
 
-    private IEnumerator AppearIn()
+    private void SpawnEnemy()
     {
-        yield return new WaitForSeconds(1f);
-        var enemy = Instantiate(_enemyMove, transform.position, Quaternion.identity);
+        EnemyMove enemy = Instantiate(_enemyMove, transform.position, Quaternion.identity);
         enemy.SetTargetPoint(_targetPoint.position);
+      
         var enemyStalking = enemy.GetComponent<EnemyStalking>();
         enemyStalking.SetPlayer(_player.transform);
     }

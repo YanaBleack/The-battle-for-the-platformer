@@ -1,34 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class EnemyHealth : MonoBehaviour
 {
-    [SerializeField] private Animator _animator;
+    [SerializeField] int _health;
     [SerializeField] int _maxHealth;
 
-    int currentHealth;
+    private int _stealHeal;
+    public int MaxHealth => _maxHealth;
+    public event UnityAction<int> HealthChanged;
+   
+    public event UnityAction DamageTaken;
+
+    public int TakeDamage(int damage)
+    {
+        _health -= damage; 
+       
+        HealthChanged?.Invoke(_health);      
+        DamageTaken.Invoke();
+
+        if (_health <= 0)
+        {
+            Die();
+        }
+        Debug.Log("Враг теряет hp");
+        return _health;
+    }
+    
+    private void Die()
+    {
+        Destroy(gameObject);
+    }
 
     private void Start()
     {
-        currentHealth = _maxHealth;
-    }
-
-    public void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-
-        _animator.SetTrigger(EnemyAnimatorData.Params.Attack);
-
-        if (currentHealth <= 0)
-        {
-            Die();         
-        }
-    }
-
-    private void Die()
-    {
-        Debug.Log("Умер!");
-        Destroy(gameObject);      
+        HealthChanged?.Invoke(_health);
     }
 }

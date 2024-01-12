@@ -29,7 +29,6 @@ public class EnemyMove : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("Враг появился!");
         _startPoint = transform.position;
     }
 
@@ -46,12 +45,10 @@ public class EnemyMove : MonoBehaviour
         if (collider.gameObject.TryGetComponent(out TargetPoint targetPoint))
         {
             _curentPoint = _startPoint;
-            Debug.Log("Задел таргет!");
         }
         else if (collider.gameObject.TryGetComponent(out SpawnerPoint spawnerPoint))
         {
             _curentPoint = _targetPoint;
-            Debug.Log("Задел старт!");
         }
     }
 }

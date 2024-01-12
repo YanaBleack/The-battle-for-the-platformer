@@ -6,42 +6,52 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    [SerializeField] private Animator _animator;
+    [SerializeField] private Animator _animator;   
+    [SerializeField] private float _speed = 1f;
+    [SerializeField] private float _jumpForce = 8f;
+    [SerializeField] private KeyCode _jump;
+
+    [Space]
+    [Header("Ground Checker Setting")]   
+    [Range(-5f, 5f)][SerializeField] private float _checkGroundOffsetY = -1.8f;
+    [Range(0, 5f)][SerializeField] private float _checkGroundRadius = 0.3f;
+
     private Rigidbody2D _rigidbody;
     private float _horizontalMove = 0f;
     private bool _facingRight = true;
+    private bool isGrounded = false;
 
-    [Header("Events")]
-    [Range(0, 10f)][SerializeField] private float _speed = 1f;
-    [Range(0, 15f)][SerializeField] private float _jumpForce = 8f;
-
-    [Space]
-    [Header("Ground Checker Setting")]
-    public bool isGrounded = false;
-    [Range(-5f, 5f)][SerializeField] private float _checkGroundOffsetY = -1.8f;
-    [Range(0, 5f)][SerializeField] private float _checkGroundRadius = 0.3f; 
-
-    private void Start()
-    {   
-        _rigidbody = GetComponent<Rigidbody2D>();      
+    private void Awake()
+    {
+        _rigidbody = GetComponent<Rigidbody2D>();             
     }
 
     private void Update()
     {
-        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+        InputManager();
+    }
+
+    private void FixedUpdate()
+    {
+        Move();
+    }
+
+    private void InputManager()
+    {
+        if (isGrounded && Input.GetKeyDown(_jump))
         {
             _rigidbody.AddForce(transform.up * _jumpForce, ForceMode2D.Impulse);
         }
 
         _horizontalMove = Input.GetAxisRaw("Horizontal") * _speed;
-      
-        _animator.SetFloat("HorizontalMove", Mathf.Abs(_horizontalMove));
 
-        if(isGrounded == false)
+         _animator.SetFloat(PlayerAnimatorData.Params.HorizontalMove, Mathf.Abs(_horizontalMove));
+
+        if (isGrounded == false)
         {
-          _animator.SetBool(PlayerAnimatorData.Params.IsJumping, true);
+            _animator.SetBool(PlayerAnimatorData.Params.IsJumping, true);
         }
-        else { _animator.SetBool(PlayerAnimatorData.Params.IsJumping, false); } 
+        else { _animator.SetBool(PlayerAnimatorData.Params.IsJumping, false); }
 
         if (_horizontalMove > 0 && !_facingRight)
         {
@@ -53,12 +63,12 @@ public class Movement : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void Move()
     {
         Vector2 targetVelocity = new Vector2(_horizontalMove * 10f, _rigidbody.velocity.y);
         _rigidbody.velocity = targetVelocity;
 
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(new Vector2(transform.position.x, transform.position.y 
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(new Vector2(transform.position.x, transform.position.y
             + _checkGroundOffsetY), _checkGroundRadius);
 
         if (colliders.Length > 1)
